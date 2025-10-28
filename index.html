@@ -108,7 +108,7 @@
     <div class="bg-white/20 rounded-full px-6 py-2 backdrop-blur-sm">
       <span class="text-white text-sm">活动幸运抽奖</span>
     </div>
-    <div class="ml-4 bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+    <div id="my-prizes" class="ml-4 bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-all">
       <span class="text-white text-sm">我的奖品</span>
     </div>
     <!-- 管理员入口 - 已参与按钮 -->
@@ -229,6 +229,29 @@
 
   <!-- 电话号码输入弹窗 -->
   <div id="phone-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+  
+  <!-- 我的奖品弹窗 -->
+  <div id="prizes-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+    <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
+      <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
+        <h3 class="text-white text-xl font-bold">我的奖品</h3>
+      </div>
+      <div class="p-6 max-h-[60vh] overflow-y-auto">
+        <div id="prizes-list" class="space-y-4">
+          <!-- 奖品列表将在这里动态生成 -->
+        </div>
+        <div id="no-prizes" class="text-center text-gray-500 py-8">
+          <i class="fa fa-trophy text-gray-300 text-3xl mb-2"></i>
+          <p>暂无中奖记录</p>
+        </div>
+      </div>
+      <div class="px-6 pb-6">
+        <button id="close-prizes" class="bg-gray-200 text-gray-700 py-3 px-8 rounded-full font-bold w-full hover:bg-gray-300 transition-all">
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
     <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
       <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
         <h3 class="text-white text-xl font-bold">验证身份</h3>
@@ -373,8 +396,101 @@
       // 例如检查是否有记住的电话号码等
     }
     
+    // 显示用户奖品
+    function showMyPrizes() {
+      const prizesList = document.getElementById('prizes-list');
+      const noPrizes = document.getElementById('no-prizes');
+      const prizesModal = document.getElementById('prizes-modal');
+      
+      // 获取当前用户的中奖记录
+      const currentPhone = currentPhoneNumber || localStorage.getItem('lastPhoneNumber');
+      if (!currentPhone) {
+        noPrizes.classList.remove('hidden');
+        prizesList.classList.add('hidden');
+        prizesModal.style.display = 'flex';
+        return;
+      }
+      
+      // 从localStorage获取所有中奖记录
+      const allUserPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
+      
+      // 筛选当前用户的中奖记录
+      const userPrizes = allUserPrizes.filter(item => item.phone === currentPhone);
+      
+      // 清空现有列表
+      prizesList.innerHTML = '';
+      
+      if (userPrizes.length === 0) {
+        // 无中奖记录
+        noPrizes.classList.remove('hidden');
+        prizesList.classList.add('hidden');
+      } else {
+        // 有中奖记录，生成列表
+        noPrizes.classList.add('hidden');
+        prizesList.classList.remove('hidden');
+        
+        // 按时间倒序排序
+        userPrizes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        userPrizes.forEach((prize) => {
+          const prizeItem = document.createElement('div');
+          prizeItem.className = 'bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 flex items-center';
+          
+          // 奖品图标
+          const iconDiv = document.createElement('div');
+          iconDiv.className = 'bg-white rounded-full w-12 h-12 flex items-center justify-center mr-4 shadow-md';
+          iconDiv.innerHTML = `<i class="fa ${prize.prizeIcon} text-primary text-xl"></i>`;
+          
+          // 奖品信息
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'flex-1';
+          
+          const nameSpan = document.createElement('div');
+          nameSpan.className = 'font-bold text-gray-800';
+          nameSpan.textContent = prize.prizeName;
+          
+          const valueSpan = document.createElement('div');
+          valueSpan.className = 'text-sm text-gray-500';
+          valueSpan.textContent = `价值: ${prize.prizeValue}`;
+          
+          // 日期信息
+          const dateSpan = document.createElement('div');
+          dateSpan.className = 'text-xs text-gray-400';
+          const date = new Date(prize.timestamp);
+          dateSpan.textContent = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          
+          infoDiv.appendChild(nameSpan);
+          infoDiv.appendChild(valueSpan);
+          infoDiv.appendChild(dateSpan);
+          
+          prizeItem.appendChild(iconDiv);
+          prizeItem.appendChild(infoDiv);
+          
+          prizesList.appendChild(prizeItem);
+        });
+      }
+      
+      // 显示弹窗
+      prizesModal.style.display = 'flex';
+    }
+    
     // 初始化
     initCheck();
+    
+    // 为"我的奖品"按钮添加点击事件
+    document.getElementById('my-prizes').addEventListener('click', showMyPrizes);
+    
+    // 关闭我的奖品弹窗
+    document.getElementById('close-prizes').addEventListener('click', () => {
+      document.getElementById('prizes-modal').style.display = 'none';
+    });
+    
+    // 点击弹窗外部关闭
+    document.getElementById('prizes-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('prizes-modal')) {
+        document.getElementById('prizes-modal').style.display = 'none';
+      }
+    });
     
     // 管理员功能 - 验证码验证相关
     const adminEntry = document.getElementById('admin-entry');
@@ -720,6 +836,26 @@
       }
     });
     
+    // 保存最后使用的电话号码
+    function saveLastPhoneNumber(phone) {
+      localStorage.setItem('lastPhoneNumber', phone);
+    }
+    
+    // "我的奖品"按钮点击事件
+    document.getElementById('my-prizes').addEventListener('click', showMyPrizes);
+    
+    // 关闭"我的奖品"弹窗
+    document.getElementById('close-prizes').addEventListener('click', () => {
+      document.getElementById('prizes-modal').style.display = 'none';
+    });
+    
+    // 点击"我的奖品"弹窗外部关闭
+    document.getElementById('prizes-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('prizes-modal')) {
+        document.getElementById('prizes-modal').style.display = 'none';
+      }
+    });
+    
     // 提交电话号码
     submitPhone.addEventListener('click', () => {
       const phone = phoneInput.value.trim();
@@ -738,8 +874,9 @@
         return;
       }
       
-      // 验证通过，记录电话号码
+      // 验证通过，记录电话号码并保存到localStorage
       currentPhoneNumber = phone;
+      saveLastPhoneNumber(phone);
       closePhoneModal();
       
       // 开始抽奖
@@ -767,6 +904,24 @@
       }
     });
     
+    // 记录用户中奖信息
+    function recordUserPrize(phone, prize) {
+      if (prize.name === '谢谢参与') return; // 不记录未中奖情况
+      
+      const userPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
+      const timestamp = new Date().toISOString();
+      
+      userPrizes.push({
+        phone: phone,
+        prizeName: prize.name,
+        prizeValue: prize.value,
+        prizeIcon: prize.icon,
+        timestamp: timestamp
+      });
+      
+      localStorage.setItem('userPrizes', JSON.stringify(userPrizes));
+    }
+    
     // 开始抽奖流程
     async function startDrawProcess() {
       if (isDrawing || drawCount <= 0) return;
@@ -782,6 +937,9 @@
       
       // 执行动画
       await startDrawAnimation(selectedPrize.id);
+      
+      // 记录用户中奖信息（如果中奖）
+      recordUserPrize(currentPhoneNumber, selectedPrize);
       
       // 显示结果
       showResult(selectedPrize);
