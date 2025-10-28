@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>幸运福利抽不停</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF4D4F',
+            secondary: '#FF9500',
+            background: '#FF6B6B',
+            lightBg: '#FF8E8E',
+            gold: '#FFD700',
+            darkGold: '#FFB800',
+          },
+          fontFamily: {
+            sans: ['Arial', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .prize-item {
+        transition: all 0.3s ease;
+      }
+      .prize-item.active {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        border-color: #FFD700;
+      }
+      .prize-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .gift-box {
+        animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      .rotate-animation {
+        animation: rotate 1s ease-in-out infinite;
+      }
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .shine {
+        position: relative;
+        overflow: hidden;
+      }
+      .shine::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(30deg);
+        animation: shine 6s infinite;
+      }
+      @keyframes shine {
+        0% { transform: rotate(30deg) translateX(-100%); }
+        100% { transform: rotate(30deg) translateX(100%); }
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-background to-lightBg min-h-screen text-white overflow-x-hidden">
+  <!-- 顶部导航 -->
+  <header class="px-4 py-3 flex justify-between items-center relative z-10">
+    <div class="text-sm opacity-80">9:41</div>
+    <div class="flex items-center space-x-2">
+      <i class="fa fa-signal"></i>
+      <i class="fa fa-wifi"></i>
+      <i class="fa fa-battery-three-quarters"></i>
+    </div>
+  </header>
+
+  <!-- 主标题 -->
+  <div class="text-center px-4 mb-2">
+    <h1 class="text-[clamp(1.5rem,5vw,2rem)] font-bold text-shadow">幸运福利抽不停</h1>
+  </div>
+
+  <!-- 活动信息 -->
+  <div class="flex justify-center items-center px-4 mb-4">
+    <div class="bg-white/20 rounded-full px-6 py-2 backdrop-blur-sm">
+      <span class="text-white text-sm">活动幸运抽奖</span>
+    </div>
+    <div class="ml-4 bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+      <span class="text-white text-sm">我的奖品</span>
+    </div>
+    <!-- 管理员入口 - 已参与按钮 -->
+    <div id="admin-entry" class="ml-4 bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-all">
+      <span class="text-white text-sm">已参与</span>
+    </div>
+  </div>
+
+  <!-- 礼品盒子动画区域 -->
+  <div class="relative w-full max-w-xs mx-auto mb-6">
+    <div class="gift-box relative">
+      <!-- 礼品盒子 -->
+      <div class="w-32 h-32 bg-primary rounded-lg mx-auto relative overflow-hidden">
+        <div class="absolute w-full h-2 bg-secondary -top-1 left-0 rounded-t-full"></div>
+        <div class="absolute w-2 h-full bg-secondary -left-1 top-0 rounded-l-full"></div>
+        <div class="absolute w-full h-2 bg-secondary -bottom-1 left-0 rounded-b-full"></div>
+        <div class="absolute w-2 h-full bg-secondary -right-1 top-0 rounded-r-full"></div>
+        
+        <!-- 丝带 -->
+        <div class="absolute w-4 h-full bg-secondary left-1/2 -ml-2 top-0"></div>
+        <div class="absolute w-full h-4 bg-secondary top-1/2 -mt-2"></div>
+        
+        <!-- 蝴蝶结 -->
+        <div class="absolute top-0 left-1/2 -ml-6 w-12 h-6 bg-secondary rounded-full"></div>
+        <div class="absolute top-0 left-1/2 -ml-2 w-4 h-4 bg-secondary rounded-full transform -translate-y-1/2"></div>
+        
+        <!-- 礼物内容 -->
+        <div class="absolute inset-0 flex items-center justify-center flex-col">
+          <i class="fa fa-gift text-gold text-2xl mb-1"></i>
+          <i class="fa fa-coffee text-white text-lg rotate-animation"></i>
+        </div>
+      </div>
+      
+      <!-- 光环效果 -->
+      <div class="absolute w-full h-6 bg-darkGold/30 rounded-full left-0 top-full mt-2"></div>
+      <div class="absolute w-4/5 h-6 bg-darkGold/20 rounded-full left-1/2 -ml-2/5 top-full mt-4"></div>
+    </div>
+  </div>
+
+  <!-- 抽奖次数提示 -->
+  <div class="text-center px-4 mb-6">
+    <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2">
+      <span class="text-white">您今天有 <i class="fa fa-gift text-gold"></i> 1次抽奖机会</span>
+    </div>
+  </div>
+
+  <!-- 抽奖区域 -->
+  <div class="px-4">
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+      <!-- 已抽奖提示 -->
+      <div id="already-drawn" class="text-center mb-3 text-sm text-yellow-300 hidden">
+        <i class="fa fa-info-circle mr-1"></i>您今天已经参与过抽奖了
+      </div>
+      
+      <!-- 奖品网格 -->
+      <div class="prize-grid">
+        <!-- 奖品1: 特等奖 -->
+        <div id="prize-1" class="prize-item bg-gradient-to-br from-gold to-darkGold rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-white text-xs font-bold mb-1 text-center">宇树Go2 Air</div>
+          <div class="text-white text-xs font-bold mb-1">机器狗</div>
+          <div class="text-white"><i class="fa fa-paw text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品2: 一等奖 -->
+        <div id="prize-2" class="prize-item bg-gradient-to-br from-gray-200 to-gray-400 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-gray-800 text-xs font-bold mb-1">德龙咖啡机</div>
+          <div class="text-gray-800 text-xs font-bold mb-1">S3 Plus</div>
+          <div class="text-gray-800"><i class="fa fa-coffee text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品3: 二等奖 -->
+        <div id="prize-3" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-secondary text-xs font-bold mb-1 text-center">美的商用微波炉</div>
+          <div class="text-secondary"><i class="fa fa-fire text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品4: 三等奖 -->
+        <div id="prize-4" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-primary text-sm font-bold mb-1 text-center">茶杯消毒柜</div>
+          <div class="text-primary"><i class="fa fa-shield text-lg"></i></div>
+        </div>
+        
+        <!-- 抽奖按钮 -->
+        <div id="draw-btn" class="bg-gradient-to-r from-primary to-secondary rounded-lg flex flex-col items-center justify-center aspect-square cursor-pointer active:scale-95 transition-all">
+          <div class="text-white font-bold text-lg">开始抽奖</div>
+          <i class="fa fa-refresh text-white mt-1"></i>
+        </div>
+        
+        <!-- 奖品5: 四等奖 -->
+        <div id="prize-5" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-primary text-sm font-bold mb-1 text-center">3000-200元</div>
+          <div class="text-primary text-sm font-bold mb-1">优惠券</div>
+          <div class="text-primary"><i class="fa fa-ticket text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品6: 五等奖 -->
+        <div id="prize-6" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-primary text-sm font-bold mb-1 text-center">1000-50元</div>
+          <div class="text-primary text-sm font-bold mb-1">优惠券</div>
+          <div class="text-primary"><i class="fa fa-ticket text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品7: 六等奖 -->
+        <div id="prize-7" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-primary text-sm font-bold mb-1 text-center">300-20元</div>
+          <div class="text-primary text-sm font-bold mb-1">优惠券</div>
+          <div class="text-primary"><i class="fa fa-ticket text-lg"></i></div>
+        </div>
+        
+        <!-- 奖品8: 谢谢参与 -->
+        <div id="prize-8" class="prize-item bg-white/90 rounded-lg p-3 flex flex-col items-center justify-center aspect-square">
+          <div class="text-gray-400 text-sm font-bold mb-1">谢谢参与</div>
+          <div class="text-gray-400"><i class="fa fa-smile-o text-lg"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 电话号码输入弹窗 -->
+  <div id="phone-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+    <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
+      <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
+        <h3 class="text-white text-xl font-bold">验证身份</h3>
+      </div>
+      <div class="p-6">
+        <div class="mb-4">
+          <label for="phone-input" class="block text-gray-700 mb-2">请输入手机号码</label>
+          <input 
+            type="tel" 
+            id="phone-input" 
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-800"
+            placeholder="请输入11位手机号码"
+            maxlength="11"
+          >
+          <div id="phone-error" class="text-red-500 text-sm mt-1 hidden">请输入正确的手机号码</div>
+          <div id="already-participated-error" class="text-red-500 text-sm mt-1 hidden">该号码已参与过抽奖</div>
+        </div>
+        <button id="submit-phone" class="bg-primary text-white py-3 px-8 rounded-full font-bold w-full shadow-lg hover:bg-opacity-90 transition-all">
+          确定
+        </button>
+        <button id="cancel-phone" class="mt-3 w-full py-3 text-gray-600 font-medium">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹出层 -->
+  <div id="result-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+    <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
+      <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
+        <h3 class="text-white text-xl font-bold">恭喜中奖</h3>
+      </div>
+      <div class="p-6 text-center">
+        <!-- 中奖奖品展示 -->
+        <div id="result-prize" class="mb-6 p-4 bg-gray-50 rounded-xl inline-block">
+          <div id="result-icon" class="text-5xl mb-3 text-primary">
+            <i class="fa fa-gift"></i>
+          </div>
+          <div id="result-text" class="text-lg font-bold text-gray-800">奖品名称</div>
+        </div>
+        
+        <!-- 奖品说明 -->
+        <div id="prize-description" class="text-sm text-gray-600 mb-6"></div>
+        
+        <!-- 奖品价值显示 -->
+        <div id="prize-value" class="text-sm text-green-600 font-medium mb-6"></div>
+        
+        <button id="close-modal" class="bg-primary text-white py-3 px-8 rounded-full font-bold w-full shadow-lg hover:bg-opacity-90 transition-all">
+          确定
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 奖品配置
+    const prizes = [
+      { id: 1, name: '宇树Go2 Air 机器狗', icon: 'fa-paw', color: 'text-white' },
+      { id: 2, name: '德龙咖啡机S3 Plus', icon: 'fa-coffee', color: 'text-gray-800' },
+      { id: 3, name: '美的商用微波炉', icon: 'fa-fire', color: 'text-secondary' },
+      { id: 4, name: '茶杯消毒柜28D-2', icon: 'fa-shield', color: 'text-primary' },
+      { id: 5, name: '3000-200元优惠券', icon: 'fa-ticket', color: 'text-primary' },
+      { id: 6, name: '1000-50元优惠券', icon: 'fa-ticket', color: 'text-primary' },
+      { id: 7, name: '300-20元优惠券', icon: 'fa-ticket', color: 'text-primary' },
+      { id: 8, name: '谢谢参与', icon: 'fa-smile-o', color: 'text-gray-400' }
+    ];
+
+    // 概率配置（根据表格设置，0.1% = 1，1% = 10，转换为相对权重）
+    const probabilities = [0, 0, 1, 10, 39, 350, 600, 0]; // 谢谢参与的概率通过其他概率计算得出
+
+    // 动画顺序（模拟转盘旋转）
+    const animationOrder = [1, 2, 3, 6, 8, 7, 4]; // 修复了错误的ID值
+    
+    // 剩余抽奖次数
+    let drawCount = 1;
+    let isDrawing = false;
+
+    // DOM元素
+    const drawBtn = document.getElementById('draw-btn');
+    const resultModal = document.getElementById('result-modal');
+    const resultIcon = document.getElementById('result-icon');
+    const resultText = document.getElementById('result-text');
+    const closeModal = document.getElementById('close-modal');
+    const phoneModal = document.getElementById('phone-modal');
+    const phoneInput = document.getElementById('phone-input');
+    const phoneError = document.getElementById('phone-error');
+    const submitPhone = document.getElementById('submit-phone');
+    const cancelPhone = document.getElementById('cancel-phone');
+    const alreadyDrawn = document.getElementById('already-drawn');
+    
+    // 当前用户的电话号码
+    let currentPhoneNumber = '';
+    
+    // 已抽奖电话号码存储键名
+    const DRAWN_PHONES_KEY = 'drawn_phone_numbers';
+    
+    // 检查电话号码格式是否正确
+    function isValidPhone(phone) {
+      const phoneRegex = /^1[3-9]\d{9}$/;
+      return phoneRegex.test(phone);
+    }
+    
+    // 检查电话号码是否已经抽过奖
+    function hasDrawn(phone) {
+      const drawnPhones = JSON.parse(localStorage.getItem(DRAWN_PHONES_KEY) || '[]');
+      return drawnPhones.includes(phone);
+    }
+    
+    // 记录电话号码已抽奖
+    function recordPhoneDraw(phone) {
+      const drawnPhones = JSON.parse(localStorage.getItem(DRAWN_PHONES_KEY) || '[]');
+      drawnPhones.push(phone);
+      localStorage.setItem(DRAWN_PHONES_KEY, JSON.stringify(drawnPhones));
+    }
+    
+    // 打开电话号码输入弹窗
+    function openPhoneModal() {
+      phoneError.classList.add('hidden');
+      document.getElementById('already-participated-error').classList.add('hidden');
+      phoneInput.value = '';
+      phoneModal.style.display = 'flex';
+      
+      // 添加弹出动画
+      const modalContent = phoneModal.querySelector('div');
+      modalContent.classList.remove('scale-100');
+      modalContent.classList.add('scale-90');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-90');
+        modalContent.classList.add('scale-100');
+      }, 10);
+    }
+    
+    // 关闭电话号码输入弹窗
+    function closePhoneModal() {
+      phoneModal.style.display = 'none';
+    }
+    
+    // 初始化检查
+    function initCheck() {
+      // 这里可以添加从localStorage或其他存储中恢复当前用户信息的逻辑
+      // 例如检查是否有记住的电话号码等
+    }
+    
+    // 初始化
+    initCheck();
+    
+    // 管理员功能 - 验证码验证相关
+    const adminEntry = document.getElementById('admin-entry');
+      // 已参与按钮点击事件
+    adminEntry.addEventListener('click', () => {
+        // 动态创建并显示验证码弹窗
+        createAndShowVerifyModal();
+      });
+    
+    // 创建并显示验证码弹窗
+    function createAndShowVerifyModal() {
+      // 检查是否已存在弹窗
+      let verifyModal = document.getElementById('verify-modal');
+      if (!verifyModal) {
+        // 创建验证码弹窗HTML
+        const modalHTML = `
+          <div id="verify-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center">
+            <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
+              <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
+                <h3 class="text-white text-xl font-bold">管理员验证</h3>
+              </div>
+              <div class="p-6">
+                <div class="mb-4">
+                  <label for="verify-code" class="block text-gray-700 mb-2">请输入验证码</label>
+                  <input 
+                    type="text" 
+                    id="verify-code" 
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-800" 
+                    placeholder="请输入验证码"
+                  >
+                  <div id="verify-error" class="text-red-500 text-sm mt-1 hidden">验证码错误，请重试</div>
+                </div>
+                <button id="submit-verify" class="bg-primary text-white py-3 px-8 rounded-full font-bold w-full shadow-lg hover:bg-opacity-90 transition-all">
+                  验证
+                </button>
+                <button id="cancel-verify" class="mt-3 w-full py-3 text-gray-600 font-medium">
+                  取消
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // 添加到body
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        verifyModal = document.getElementById('verify-modal');
+        
+        // 添加事件监听器
+        const verifyCodeInput = document.getElementById('verify-code');
+        const verifyError = document.getElementById('verify-error');
+        const submitVerify = document.getElementById('submit-verify');
+        const cancelVerify = document.getElementById('cancel-verify');
+        
+        // 固定验证码：dms
+        const CORRECT_VERIFY_CODE = 'dms';
+        
+        // 提交验证码
+        submitVerify.addEventListener('click', () => {
+          const code = verifyCodeInput.value.trim().toLowerCase();
+          
+          if (code === CORRECT_VERIFY_CODE) {
+            // 移除验证码弹窗
+            verifyModal.remove();
+            // 显示参与者明细
+            createAndShowParticipantsModal();
+          } else {
+            verifyError.classList.remove('hidden');
+          }
+        });
+        
+        // 取消验证码
+        cancelVerify.addEventListener('click', () => {
+          verifyModal.remove();
+        });
+        
+        // 验证码输入框按回车时提交
+        verifyCodeInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            submitVerify.click();
+          }
+        });
+        
+        // 添加弹出动画
+        const modalContent = verifyModal.querySelector('div');
+        modalContent.classList.remove('scale-100');
+        modalContent.classList.add('scale-90');
+        setTimeout(() => {
+          modalContent.classList.remove('scale-90');
+          modalContent.classList.add('scale-100');
+        }, 10);
+      }
+    }
+    
+    // 创建并显示参与者明细弹窗
+    function createAndShowParticipantsModal() {
+      // 创建参与者明细弹窗HTML
+      const modalHTML = `
+        <div id="participants-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center">
+          <div class="bg-white rounded-xl w-11/12 max-w-2xl max-h-[80vh] overflow-hidden transform transition-all duration-300 scale-100">
+            <div class="bg-gradient-to-r from-primary to-secondary p-4 flex justify-between items-center">
+              <h3 class="text-white text-xl font-bold">参与者明细</h3>
+              <button id="close-participants" class="text-white">
+                <i class="fa fa-times text-xl"></i>
+              </button>
+            </div>
+            <div class="p-6">
+              <div class="mb-4">
+                <h4 class="text-gray-700 font-medium mb-2">参与抽奖的电话号码：</h4>
+                <div id="participants-list" class="bg-gray-50 rounded-lg p-4 max-h-[40vh] overflow-y-auto">
+                  <!-- 参与者列表将通过JavaScript动态生成 -->
+                  <div class="text-gray-400 text-center py-8">暂无参与者数据</div>
+                </div>
+              </div>
+              <button id="export-excel" class="bg-secondary text-white py-3 px-8 rounded-full font-bold w-full shadow-lg hover:bg-opacity-90 transition-all flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i> 导出Excel
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 添加到body
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      const participantsModal = document.getElementById('participants-modal');
+      const participantsList = document.getElementById('participants-list');
+      const closeParticipants = document.getElementById('close-participants');
+      const exportExcelBtn = document.getElementById('export-excel');
+      
+      // 加载参与者列表
+      loadParticipantsList();
+      
+      // 关闭参与者明细弹窗
+      closeParticipants.addEventListener('click', () => {
+        participantsModal.remove();
+      });
+      
+      // 导出Excel功能
+      exportExcelBtn.addEventListener('click', () => {
+        exportParticipantsToExcel();
+      });
+      
+      // 添加弹出动画
+      const modalContent = participantsModal.querySelector('div');
+      modalContent.classList.remove('scale-100');
+      modalContent.classList.add('scale-90');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-90');
+        modalContent.classList.add('scale-100');
+      }, 10);
+    }
+    
+    // 加载参与者列表
+    function loadParticipantsList() {
+      const drawnPhones = JSON.parse(localStorage.getItem(DRAWN_PHONES_KEY) || '[]');
+      const participantsList = document.getElementById('participants-list');
+      
+      if (drawnPhones.length === 0) {
+        participantsList.innerHTML = '<div class="text-gray-400 text-center py-8">暂无参与者数据</div>';
+        return;
+      }
+      
+      // 生成参与者列表HTML
+      let html = '<div class="space-y-2">';
+      drawnPhones.forEach((phone, index) => {
+        html += `
+          <div class="flex justify-between items-center p-2 border-b border-gray-100">
+            <span class="text-gray-700">${phone}</span>
+            <span class="text-gray-500 text-sm">第${index + 1}位</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      participantsList.innerHTML = html;
+    }
+    
+    // 导出参与者数据到Excel
+    function exportParticipantsToExcel() {
+      const drawnPhones = JSON.parse(localStorage.getItem(DRAWN_PHONES_KEY) || '[]');
+      
+      if (drawnPhones.length === 0) {
+        alert('暂无数据可导出');
+        return;
+      }
+      
+      // 创建CSV格式数据（可被Excel打开）
+      let csvContent = '序号,电话号码\n';
+      drawnPhones.forEach((phone, index) => {
+        csvContent += `${index + 1},${phone}\n`;
+      });
+      
+      // 创建下载链接
+      const blob = new Blob([`\ufeff${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `参与者明细_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 根据概率随机选择奖品
+    function selectPrize() {
+      // 重新计算有效概率（排除0概率的奖项）
+      const validProbabilities = probabilities.map(p => p);
+      
+      // 谢谢参与的概率 = 100% - 其他奖项概率总和
+      const totalProbability = validProbabilities.reduce((a, b) => a + b, 0);
+      validProbabilities[7] = 1000 - totalProbability; // 1000代表100%（0.1%为1单位）
+      
+      // 计算总权重
+      const total = validProbabilities.reduce((a, b) => a + b, 0);
+      let random = Math.random() * total;
+      let sum = 0;
+      
+      for (let i = 0; i < validProbabilities.length; i++) {
+        sum += validProbabilities[i];
+        if (random < sum) {
+          return prizes[i];
+        }
+      }
+      return prizes[7]; // 默认返回谢谢参与
+    }
+
+    // 抽奖动画
+    function startDrawAnimation(targetId) {
+      return new Promise((resolve) => {
+        let currentIndex = 0;
+        let speed = 100;
+        let steps = 0;
+        const totalSteps = 50; // 总步数
+        const targetPos = prizes.findIndex(p => p.id === targetId);
+        
+        const animate = () => {
+          steps++;
+          
+          // 清除所有活动状态
+            document.querySelectorAll('.prize-item').forEach(item => {
+              item.classList.remove('active');
+            });
+          
+          // 高亮当前奖品
+          const currentPos = animationOrder[currentIndex % animationOrder.length];
+          if (currentPos !== 5) { // 跳过中心按钮
+            document.getElementById(`prize-${currentPos}`).classList.add('active');
+          }
+          
+          // 加速阶段
+          if (steps < 10) {
+            speed -= 5;
+          }
+          // 匀速阶段
+          else if (steps < totalSteps - 10) {
+            speed = 50;
+          }
+          // 减速阶段
+          else {
+            speed += 10;
+          }
+          
+          // 检查是否到达目标位置
+          if (steps >= totalSteps && currentPos === targetId) {
+            resolve();
+            return;
+          }
+          // 添加额外的安全退出条件，避免无限循环
+          if (steps > totalSteps * 2) {
+            console.warn('抽奖动画超时，强制结束');
+            resolve();
+            return;
+          }
+          
+          currentIndex++;
+          setTimeout(animate, speed);
+        };
+        
+        animate();
+      });
+    }
+
+    // 奖品详细信息配置
+    const prizeDetails = {
+      1: { description: '高端智能机器狗，支持多种交互模式', value: '价值 ¥9997' },
+      2: { description: '德龙品牌高端咖啡机，享受专业咖啡体验', value: '价值 ¥3390' },
+      3: { description: '美的商用级微波炉，大容量智能操作', value: '价值 ¥1799' },
+      4: { description: '专业茶杯消毒柜，UV杀菌保护健康', value: '价值 ¥549' },
+      5: { description: '满3000元即可使用，有效期30天', value: '价值 ¥200' },
+      6: { description: '满1000元即可使用，有效期30天', value: '价值 ¥50' },
+      7: { description: '满300元即可使用，有效期30天', value: '价值 ¥20' },
+      8: { description: '不要灰心，再接再厉', value: '' }
+    };
+
+    // 显示结果
+    function showResult(prize) {
+      // 设置图标
+      resultIcon.innerHTML = `<i class="fa ${prize.icon}"></i>`;
+      resultIcon.className = `${prize.color} text-5xl mb-3`;
+      
+      // 设置奖品名称
+      resultText.textContent = prize.name;
+      
+      // 设置奖品描述和价值
+      const details = prizeDetails[prize.id];
+      document.getElementById('prize-description').textContent = details.description;
+      document.getElementById('prize-value').textContent = details.value;
+      
+      // 为不同类型的奖品添加特殊样式
+      const resultPrize = document.getElementById('result-prize');
+      if (prize.id <= 3) { // 高价值奖品
+        resultPrize.classList.add('shine', 'border-2', 'border-gold');
+      } else if (prize.id === 8) { // 谢谢参与
+        document.querySelector('#result-modal h3').textContent = '感谢参与';
+        resultPrize.classList.remove('shine', 'border-2', 'border-gold');
+      } else { // 优惠券等
+        resultPrize.classList.remove('shine', 'border-2', 'border-gold');
+      }
+      
+      // 显示弹窗并添加弹出动画
+      resultModal.style.display = 'flex';
+      const modalContent = resultModal.querySelector('div');
+      modalContent.classList.remove('scale-100');
+      modalContent.classList.add('scale-90');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-90');
+        modalContent.classList.add('scale-100');
+      }, 10);
+    }
+
+    // 抽奖按钮点击事件
+    drawBtn.addEventListener('click', () => {
+      if (isDrawing) return;
+      
+      // 如果已经验证过身份并且还能抽奖
+      if (currentPhoneNumber && drawCount > 0) {
+        startDrawProcess();
+      } else {
+        // 否则显示电话号码输入弹窗
+        openPhoneModal();
+      }
+    });
+    
+    // 提交电话号码
+    submitPhone.addEventListener('click', () => {
+      const phone = phoneInput.value.trim();
+      
+      // 验证电话号码格式
+      if (!isValidPhone(phone)) {
+        phoneError.classList.remove('hidden');
+        return;
+      }
+      
+      // 检查是否已经抽过奖
+      if (hasDrawn(phone)) {
+        // 显示已参与错误提示
+        phoneError.classList.add('hidden');
+        document.getElementById('already-participated-error').classList.remove('hidden');
+        return;
+      }
+      
+      // 验证通过，记录电话号码
+      currentPhoneNumber = phone;
+      closePhoneModal();
+      
+      // 开始抽奖
+      startDrawProcess();
+    });
+    
+    // 取消输入电话号码
+    cancelPhone.addEventListener('click', () => {
+      closePhoneModal();
+    });
+    
+    // 电话号码输入事件处理
+    phoneInput.addEventListener('input', () => {
+      // 只允许输入数字
+      phoneInput.value = phoneInput.value.replace(/\D/g, '');
+      // 隐藏错误提示
+      phoneError.classList.add('hidden');
+      document.getElementById('already-participated-error').classList.add('hidden');
+    });
+    
+    // 电话号码输入框按回车时提交
+    phoneInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        submitPhone.click();
+      }
+    });
+    
+    // 开始抽奖流程
+    async function startDrawProcess() {
+      if (isDrawing || drawCount <= 0) return;
+      
+      isDrawing = true;
+      drawCount--;
+      
+      // 记录已抽奖
+      recordPhoneDraw(currentPhoneNumber);
+      
+      // 选择奖品
+      const selectedPrize = selectPrize();
+      
+      // 执行动画
+      await startDrawAnimation(selectedPrize.id);
+      
+      // 显示结果
+      showResult(selectedPrize);
+      
+      isDrawing = false;
+    }
+
+    // 关闭弹出层
+    closeModal.addEventListener('click', () => {
+      resultModal.style.display = 'none';
+      
+      // 清除所有活动状态
+      document.querySelectorAll('.prize-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // 如果抽奖次数用完了，显示已抽奖提示
+      if (drawCount <= 0) {
+        alreadyDrawn.classList.remove('hidden');
+      }
+    });
+    
+
+
+  </script>
+</body>
+</html>
