@@ -1,0 +1,216 @@
+<!-- 主要内容区域 -->
+<view class="container">
+  <!-- 头部区域 -->
+  <view class="header">
+    <view class="header-title">幸运抽奖</view>
+    <view class="header-subtitle">试试手气，赢取惊喜奖品！</view>
+  </view>
+  
+  <!-- 抽奖区域 -->
+  <view class="draw-area">
+    <view class="text-center">
+      <view class="draw-title">点击开始抽奖</view>
+      <view class="draw-subtitle">每人仅有一次抽奖机会</view>
+    </view>
+        
+        <view class="prizes-grid">
+          <!-- 奖品1: 宇树Go2 Air机器狗 -->
+          <view id="prize-1" class="prize-item {{activePrizeId === 1 ? 'active' : ''}}">
+            <view class="prize-name">宇树Go2 Air机器狗</view>
+            <view class="prize-icon">🏆</view>
+          </view>
+          
+          <!-- 奖品2: 德龙咖啡机S3 Plus -->
+          <view id="prize-2" class="prize-item {{activePrizeId === 2 ? 'active' : ''}}">
+            <view class="prize-name">德龙咖啡机S3 Plus</view>
+            <view class="prize-icon">🎁</view>
+          </view>
+          
+          <!-- 奖品3: 美的商用微波炉EM925F4T-SS -->
+          <view id="prize-3" class="prize-item {{activePrizeId === 3 ? 'active' : ''}}">
+            <view class="prize-name">美的商用微波炉</view>
+            <view class="prize-icon">⭐</view>
+          </view>
+          
+          <!-- 奖品4: 茶杯消毒柜28D-2 -->
+          <view id="prize-4" class="prize-item {{activePrizeId === 4 ? 'active' : ''}}">
+            <view class="prize-name">茶杯消毒柜</view>
+            <view class="prize-icon">📜</view>
+          </view>
+          
+          <!-- 奖品5: 3000-200元优惠券 -->
+          <view id="prize-5" class="prize-item {{activePrizeId === 5 ? 'active' : ''}}">
+            <view class="prize-name">3000-200元优惠券</view>
+            <view class="prize-icon">🎫</view>
+          </view>
+          
+          <!-- 奖品6: 1000-50元优惠券 -->
+          <view id="prize-6" class="prize-item {{activePrizeId === 6 ? 'active' : ''}}">
+            <view class="prize-name">1000-50元优惠券</view>
+            <view class="prize-icon">🎁</view>
+          </view>
+          
+          <!-- 奖品7: 300-20元优惠券 -->
+          <view id="prize-7" class="prize-item {{activePrizeId === 7 ? 'active' : ''}}">
+            <view class="prize-name">300-20元优惠券</view>
+            <view class="prize-icon">🏷️</view>
+          </view>
+          
+          <!-- 奖品8: 谢谢参与 -->
+          <view id="prize-8" class="prize-item {{activePrizeId === 8 ? 'active' : ''}}">
+            <view class="prize-name" style="color: #999;">谢谢参与</view>
+            <view class="prize-icon" style="color: #999;">😊</view>
+          </view>
+        </view>
+        
+    <!-- 抽奖按钮区域 - 确保按钮可见 -->
+    <view class="draw-btn-container">
+      <button id="draw-btn" class="draw-btn" disabled="{{isDrawing || drawBtnText === '已参加'}}" bindtap="onDrawBtnClick">
+        {{drawBtnText}}
+      </button>
+      <view class="draw-btn-tip">点击按钮立即抽奖</view>
+    </view>
+  </view>
+
+  <!-- 电话号码输入弹窗 -->
+  <view id="phone-modal" class="modal-backdrop" style="display: {{phoneModalVisible ? 'flex' : 'none'}}">
+    <view class="modal-container">
+      <view class="modal-header">
+        <view class="modal-title">验证身份</view>
+      </view>
+      <view class="p-6">
+        <view>
+          <view class="block text-gray-700 mb-2 text-wechat-sm">请输入手机号码</view>
+          <input 
+            type="tel" 
+            id="phone-input" 
+            class="phone-input"
+            placeholder="请输入11位手机号码"
+            maxlength="11"
+            value="{{phoneInput}}"
+            bindinput="onPhoneInput"
+          />
+          <view id="phone-error" class="error-message" style="display: {{showPhoneError ? 'block' : 'none'}};">请输入正确的手机号码</view>
+          <view id="already-participated-error" class="error-message" style="display: {{showAlreadyParticipatedError ? 'block' : 'none'}};">该号码已参与过抽奖</view>
+        </view>
+        <button id="submit-phone" class="btn btn-primary" bindtap="submitPhoneNumber">
+          确定
+        </button>
+        <button id="cancel-phone" class="btn btn-secondary mt-3" bindtap="hidePhoneModal">
+          取消
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 抽奖结果弹窗 -->
+  <view id="result-modal" class="modal-backdrop" style="display: {{resultModalVisible ? 'flex' : 'none'}}">
+    <view class="modal-container">
+      <view class="modal-header">
+        <view class="modal-title">恭喜中奖</view>
+      </view>
+      <view class="result-modal-content p-6">
+        <view class="result-icon">
+          <!-- 根据奖品ID显示对应的emoji图标 -->
+          <text wx:if="{{currentPrizeId === 1}}">🏆</text>
+          <text wx:elif="{{currentPrizeId === 2}}">🎁</text>
+          <text wx:elif="{{currentPrizeId === 3}}">⭐</text>
+          <text wx:elif="{{currentPrizeId === 4}}">📜</text>
+          <text wx:elif="{{currentPrizeId === 5}}">🎫</text>
+          <text wx:elif="{{currentPrizeId === 6}}">🎁</text>
+          <text wx:elif="{{currentPrizeId === 7}}">🏷️</text>
+          <text wx:else>😊</text>
+        </view>
+        <view class="result-name">{{currentPrizeName}}</view>
+        <view class="result-description">{{currentPrizeDescription}}</view>
+        <view class="result-value">价值: {{currentPrizeValue}}</view>
+        <button id="close-result" class="btn btn-primary mt-4" bindtap="hideResult">
+          确定
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的奖品弹窗 -->
+  <view id="prizes-modal" class="modal-backdrop" style="display: {{prizesModalVisible ? 'flex' : 'none'}}">
+    <view class="modal-container">
+      <view class="modal-header">
+        <view class="modal-title">我的奖品</view>
+      </view>
+      <view class="prizes-list">
+        <view id="prizes-list" wx:if="{{userPrizes.length > 0}}">
+          <view class="prize-record" wx:for="{{userPrizes}}" wx:key="index">
+            <view class="prize-record-info">
+              <view class="prize-record-name">{{item.prizeName}}</view>
+              <view class="prize-record-time">{{item.formattedTime}}</view>
+            </view>
+          </view>
+        </view>
+        <view id="no-prizes" class="text-center text-gray-500 py-8" wx:else>
+          <view class="mb-2">🏆</view>
+          <view class="text-wechat-sm">暂无中奖记录</view>
+        </view>
+      </view>
+      <view class="px-6 pb-6">
+        <button id="close-prizes" class="btn btn-secondary" bindtap="hidePrizesModal">
+          关闭
+        </button>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 底部区域 -->
+  <view class="bottom-section">
+    <view class="prizes-hint">查看您的中奖记录👇</view>
+    <button id="show-prizes" class="my-prizes-btn-bottom" bindtap="showPrizesModal">
+      我的奖品
+    </button>
+    
+    <view class="mt-4"></view>
+    
+    <view class="participated-hint">查看参与记录👇</view>
+    <button id="show-participated" class="participated-btn" bindtap="showVerificationModal">
+      已参加
+    </button>
+  </view>
+  
+  <!-- 验证码弹窗 -->
+  <modal wx:if="{{verificationModalVisible}}" class="modal-container" catchtouchmove="preventTouchMove">
+    <view class="modal-header">
+      <view class="modal-title">输入验证码</view>
+      <view class="modal-close" bindtap="hideVerificationModal">×</view>
+    </view>
+    <view class="p-6">
+      <view class="text-wechat-sm mb-4">请输入验证码查看参与记录</view>
+      <view class="form-group">
+        <input class="verification-input" type="text" placeholder="请输入验证码" bindinput="onVerificationInput" value="{{verificationCode}}" />
+      </view>
+      <view class="mt-6">
+        <button class="btn btn-primary" bindtap="verifyCode">确定</button>
+        <button class="btn btn-secondary" bindtap="hideVerificationModal">取消</button>
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 已参加明细弹窗 -->
+  <modal wx:if="{{participatedModalVisible}}" class="modal-container" catchtouchmove="preventTouchMove">
+    <view class="modal-header">
+      <view class="modal-title">参与记录明细</view>
+      <view class="modal-close" bindtap="hideParticipatedModal">×</view>
+    </view>
+    <view class="p-6">
+      <view wx:if="{{participatedRecords.length > 0}}" class="participated-list">
+        <view wx:for="{{participatedRecords}}" wx:key="index" class="participated-item">
+          <view class="participated-phone">{{item.phone}}</view>
+          <view class="participated-time">{{item.time}}</view>
+        </view>
+      </view>
+      <view wx:else class="text-center py-8">
+        <view class="text-wechat-sm">暂无参与记录</view>
+      </view>
+      <view class="mt-6">
+        <button class="btn btn-secondary" bindtap="hideParticipatedModal">关闭</button>
+      </view>
+    </view>
+  </modal>
+</view>

@@ -1,0 +1,499 @@
+/* 微信小程序抽奖页面样式 - 严格基于750×1334px(@2x)设计稿标准 */
+
+/* 微信风格字体大小 - 统一使用rpx单位 */
+.text-wechat-xs { font-size: 24rpx; }
+.text-wechat-sm {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 0;
+  display: block;
+  font-weight: 500;
+}
+.text-wechat-base { font-size: 32rpx; }
+.text-wechat-lg { font-size: 36rpx; }
+.text-wechat-xl { font-size: 40rpx; }
+.text-wechat-2xl { font-size: 48rpx; }
+
+/* 基础样式 - 严格控制页面尺寸 */
+page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 1334rpx; /* 基于1334px(@2x)设计稿 */
+  padding: 0;
+  margin: 0;
+  width: 750rpx; /* 固定宽度为750rpx */
+  box-sizing: border-box;
+}
+
+/* 主色调 */
+.primary { color: #3B82F6; }
+.bg-primary { background-color: #3B82F6; }
+
+/* 容器 - 严格基于750×1334px(@2x)设计稿标准 */
+.container {
+  width: 750rpx; /* 精确宽度 */
+  padding: 20rpx;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* 头部 - 严格基于750×1334px(@2x)设计稿 */
+.header {
+  text-align: center;
+  padding: 40rpx 20rpx 30rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 710rpx; /* 精确宽度：750rpx - 20rpx*2 */
+  box-sizing: border-box;
+}
+
+.header-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #3B82F6;
+  margin-bottom: 16rpx;
+}
+
+.header-subtitle {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 旧的头部奖品按钮样式已移除，移至底部 */
+
+/* 抽奖区域 - 严格基于750×1334px(@2x)设计稿 */
+.draw-area {
+  background-color: #fff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+  width: 710rpx; /* 精确宽度：750rpx - 20rpx*2 */
+  min-height: 800rpx;
+  box-sizing: border-box;
+}
+
+.draw-title {
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.draw-subtitle {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 28rpx;
+}
+
+/* 奖品网格 - 严格基于750×1334px(@2x)设计稿 */
+.prizes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+  margin-bottom: 36rpx;
+  border: 2rpx solid #3B82F6;
+  border-radius: 16rpx;
+  padding: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 奖品项 - 严格基于750×1334px(@2x)设计稿 */
+.prize-item {
+  background-color: #f8f8f8;
+  border-radius: 12rpx;
+  padding: 16rpx 8rpx;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 130rpx;
+  box-sizing: border-box;
+}
+
+.prize-item.active {
+  background-color: #f0f8ff;
+  border: 4rpx solid #1677ff;
+  box-shadow: 0 4rpx 16rpx rgba(22, 119, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* 奖品名称 - 严格基于750×1334px(@2x)设计稿 */
+.prize-name {
+  font-size: 20rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  width: 100%;
+}
+
+/* 奖品图标 - 严格基于750×1334px(@2x)设计稿 */
+.prize-icon {
+  font-size: 44rpx;
+  color: #3B82F6;
+}
+
+/* 抽奖按钮 - 严格基于750×1334px(@2x)设计稿 */
+.draw-btn {
+  background-color: #ff4757;
+  color: white;
+  border: 4rpx solid #ff3838;
+  padding: 32rpx 0;
+  width: 580rpx;
+  border-radius: 44rpx;
+  font-size: 44rpx;
+  font-weight: bold;
+  margin: 0 auto;
+  box-shadow: 0 12rpx 30rpx rgba(255, 71, 87, 0.5);
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+/* 已抽奖状态的样式 - 不允许点击且视觉上明显区分 */
+.draw-btn[disabled] {
+  background-color: #ccc;
+  border-color: #bbb;
+  box-shadow: none;
+  color: #666;
+  opacity: 0.8;
+  animation: none;
+  cursor: not-allowed;
+}
+
+/* 激活状态 - 只对"开始抽奖"按钮生效 */
+.draw-btn:active:not([disabled]) {
+  background-color: #ff3838;
+  transform: scale(0.98);
+}
+
+/* 添加脉冲动画让按钮更引人注目 */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.draw-btn:not(:disabled) {
+  animation: pulse 3s infinite;
+}
+
+.draw-btn-tip {
+  color: #666;
+  font-size: 26rpx;
+  margin-top: 16rpx;
+  text-align: center;
+}
+
+/* 抽奖按钮容器 - 严格基于750×1334px(@2x)设计稿 */
+.draw-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40rpx;
+  margin-bottom: 30rpx;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 确保抽奖区域有足够的内边距 */
+.draw-area {
+  padding-bottom: 40rpx;
+}
+
+/* 弹窗背景 - 严格基于750×1334px(@2x)设计稿 */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+/* 弹窗容器 - 严格基于750×1334px(@2x)设计稿 */
+.modal-container {
+  background-color: #fff;
+  border-radius: 24rpx;
+  width: 680rpx; /* 精确宽度 */
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.modal-header {
+  padding: 36rpx 40rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.modal-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 40rpx;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 电话号码输入框 - 严格基于750×1334px(@2x)设计稿 */
+.phone-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 28rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  margin-top: 20rpx;
+  margin-bottom: 24rpx;
+  box-sizing: border-box;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+}
+
+/* 按钮样式 - 严格基于750×1334px(@2x)设计稿 */
+.btn {
+  width: 100%;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  display: block;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.p-6 {
+  padding: 36rpx 40rpx;
+}
+
+.btn-primary {
+  background-color: #3B82F6;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* 错误提示 - 严格基于750×1334px(@2x)设计稿 */
+.error-message {
+  color: #ff4d4f;
+  font-size: 20rpx;
+  margin-top: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+/* 结果弹窗内容 - 严格基于750×1334px(@2x)设计稿 */
+.result-modal-content {
+  text-align: center;
+  padding: 36rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.result-icon {
+  font-size: 80rpx;
+  color: #3B82F6;
+  margin-bottom: 30rpx;
+}
+
+.result-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.result-description {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.result-value {
+  font-size: 32rpx;
+  color: #ff6b6b;
+  margin-bottom: 30rpx;
+}
+
+/* 奖品列表 - 严格基于750×1334px(@2x)设计稿 */
+.prizes-list {
+  max-height: 500rpx;
+  overflow-y: auto;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.prize-record {
+  padding: 25rpx 0;
+  border-bottom: 1px solid #eee;
+}
+
+.prize-record:last-child {
+  border-bottom: none;
+}
+
+.prize-record-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.prize-record-name {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.prize-record-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 底部奖品查看区域 - 严格基于750×1334px(@2x)设计稿 */
+.bottom-section {
+  margin-top: 40rpx;
+  margin-bottom: 40rpx;
+  padding: 0 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 710rpx;
+  box-sizing: border-box;
+}
+
+/* 奖品提示文字 */
+.prizes-hint {
+  font-size: 24rpx;
+  color: #000;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+
+/* 底部我的奖品按钮 */
+.my-prizes-btn-bottom {
+  width: 100%;
+  padding: 32rpx;
+  font-size: 30rpx;
+  color: #3B82F6;
+  background-color: #fff;
+  border: 2rpx solid #3B82F6;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.1);
+  line-height: 1.4;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* 底部按钮点击效果 */
+.my-prizes-btn-bottom:active {
+  background-color: #f0f9ff;
+  transform: scale(0.98);
+}
+
+/* 已参加按钮样式 */
+.participated-btn {
+  width: 100%;
+  padding: 32rpx;
+  font-size: 30rpx;
+  color: #666;
+  background-color: #f5f5f5;
+  border: 2rpx solid #ddd;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  line-height: 1.4;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  margin-bottom: 20rpx;
+}
+
+/* 已参加按钮点击效果 */
+.participated-btn:active {
+  background-color: #e8e8e8;
+  transform: scale(0.98);
+}
+
+/* 验证码输入框样式 */
+.verification-input {
+  width: 100%;
+  height: 88rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 16rpx;
+  padding: 0 28rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+/* 参与记录列表样式 */
+.participated-list {
+  max-height: 500rpx;
+  overflow-y: auto;
+}
+
+.participated-item {
+  padding: 28rpx 0;
+  border-bottom: 2rpx solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.participated-phone {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.participated-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 参与记录提示文字 */
+.participated-hint {
+  font-size: 24rpx;
+  color: #000;
+  margin-bottom: 16rpx;
+  text-align: center;
+  margin-top: 40rpx;
+}
+
+/* 移除媒体查询，因为使用rpx单位后微信小程序会自动适配不同屏幕尺寸
+   基于750×1334px(@2x)设计稿标准，确保在所有设备上都能正确显示 */

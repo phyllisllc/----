@@ -1,0 +1,23 @@
+/* app.wxss */
+page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #EFF6FF, #F5F3FF);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 微信风格的滚动条 */
+.wechat-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.wechat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wechat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 2px;
+}
