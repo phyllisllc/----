@@ -229,6 +229,8 @@
 
   <!-- 电话号码输入弹窗 -->
   <div id="phone-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+    <!-- 电话号码输入弹窗内容 -->
+  </div>
   
   <!-- 我的奖品弹窗 -->
   <div id="prizes-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
@@ -240,7 +242,7 @@
         <div id="prizes-list" class="space-y-4">
           <!-- 奖品列表将在这里动态生成 -->
         </div>
-        <div id="no-prizes" class="text-center text-gray-500 py-8">
+        <div id="no-prizes" class="text-center text-gray-500 py-8 hidden">
           <i class="fa fa-trophy text-gray-300 text-3xl mb-2"></i>
           <p>暂无中奖记录</p>
         </div>
@@ -252,6 +254,84 @@
       </div>
     </div>
   </div>
+      
+      
+
+        
+        // 清空现有列表
+        prizesList.innerHTML = '';
+        
+        if (!currentPhone) {
+          // 如果没有电话号码，显示无记录
+          noPrizes.classList.remove('hidden');
+          prizesList.classList.add('hidden');
+        } else {
+          // 从localStorage获取所有中奖记录
+          const allUserPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
+          console.log('所有中奖记录:', allUserPrizes);
+          
+          // 筛选当前用户的中奖记录
+          const userPrizes = allUserPrizes.filter(item => item.phone === currentPhone);
+          
+          if (userPrizes.length === 0) {
+            // 无中奖记录
+            noPrizes.classList.remove('hidden');
+            prizesList.classList.add('hidden');
+          } else {
+            // 有中奖记录，生成列表
+            noPrizes.classList.add('hidden');
+            prizesList.classList.remove('hidden');
+            
+            // 按时间倒序排序
+            userPrizes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            userPrizes.forEach((prize) => {
+              const prizeItem = document.createElement('div');
+              prizeItem.className = 'bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 flex items-center';
+              
+              // 奖品图标
+              const iconDiv = document.createElement('div');
+              iconDiv.className = 'bg-white rounded-full w-12 h-12 flex items-center justify-center mr-4 shadow-md';
+              iconDiv.innerHTML = `<i class="fa ${prize.prizeIcon} text-primary text-xl"></i>`;
+              
+              // 奖品信息
+              const infoDiv = document.createElement('div');
+              infoDiv.className = 'flex-1';
+              
+              const nameSpan = document.createElement('div');
+              nameSpan.className = 'font-bold text-gray-800';
+              nameSpan.textContent = prize.prizeName;
+              
+              // 奖品价值
+              const valueSpan = document.createElement('div');
+              valueSpan.className = 'text-sm text-gray-500';
+              valueSpan.textContent = `价值: ${prize.prizeValue || '未知'}`;
+              
+              // 中奖时间
+              const timeSpan = document.createElement('div');
+              timeSpan.className = 'text-xs text-gray-400';
+              timeSpan.textContent = `中奖时间: ${formatDate(prize.timestamp)}`;
+              
+              infoDiv.appendChild(nameSpan);
+              infoDiv.appendChild(valueSpan);
+              infoDiv.appendChild(timeSpan);
+              
+              prizeItem.appendChild(iconDiv);
+              prizeItem.appendChild(infoDiv);
+              
+              prizesList.appendChild(prizeItem);
+            });
+          }
+        }
+        
+        // 显示弹窗
+        prizesModal.style.display = 'flex';
+      } catch (error) {
+        console.error('显示奖品时出错:', error);
+        // 如果出错，显示错误提示
+        alert('查看奖品失败，请稍后再试');
+      }
+    }
     <div class="bg-white rounded-xl w-4/5 max-w-sm overflow-hidden transform transition-all duration-300 scale-100">
       <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
         <h3 class="text-white text-xl font-bold">验证身份</h3>
@@ -308,20 +388,30 @@
   </div>
 
   <script>
-    // 奖品配置
+    // 奖品配置 - 优化版
     const prizes = [
-      { id: 1, name: '宇树Go2 Air 机器狗', icon: 'fa-paw', color: 'text-white' },
-      { id: 2, name: '德龙咖啡机S3 Plus', icon: 'fa-coffee', color: 'text-gray-800' },
-      { id: 3, name: '美的商用微波炉', icon: 'fa-fire', color: 'text-secondary' },
-      { id: 4, name: '茶杯消毒柜28D-2', icon: 'fa-shield', color: 'text-primary' },
-      { id: 5, name: '3000-200元优惠券', icon: 'fa-ticket', color: 'text-primary' },
-      { id: 6, name: '1000-50元优惠券', icon: 'fa-ticket', color: 'text-primary' },
-      { id: 7, name: '300-20元优惠券', icon: 'fa-ticket', color: 'text-primary' },
-      { id: 8, name: '谢谢参与', icon: 'fa-smile-o', color: 'text-gray-400' }
+      { id: 1, name: 'Apple Watch Series 9', icon: 'fa-clock-o', color: 'text-white' },
+      { id: 2, name: 'Dyson V15 无线吸尘器', icon: 'fa-broom', color: 'text-gray-800' },
+      { id: 3, name: 'Nintendo Switch OLED', icon: 'fa-gamepad', color: 'text-secondary' },
+      { id: 4, name: '小米空气净化器4 Pro', icon: 'fa-leaf', color: 'text-primary' },
+      { id: 5, name: '满2000减150元优惠券', icon: 'fa-ticket-alt', color: 'text-primary' },
+      { id: 6, name: '满1000减80元优惠券', icon: 'fa-ticket-alt', color: 'text-primary' },
+      { id: 7, name: '满500减50元优惠券', icon: 'fa-ticket-alt', color: 'text-primary' },
+      { id: 8, name: '参与奖-10元无门槛券', icon: 'fa-gift', color: 'text-gray-500' }
     ];
 
-    // 概率配置（根据表格设置，0.1% = 1，1% = 10，转换为相对权重）
-    const probabilities = [0, 0, 1, 10, 39, 350, 600, 0]; // 谢谢参与的概率通过其他概率计算得出
+    // 概率配置（相对权重，总和为1000）
+    // 高价值奖品概率较低，中低价值奖品概率适中，参与奖保证用户有所收获
+    const probabilities = [
+      1,   // Apple Watch Series 9 (0.1%)
+      2,   // Dyson V15 无线吸尘器 (0.2%)
+      5,   // Nintendo Switch OLED (0.5%)
+      20,  // 小米空气净化器4 Pro (2%)
+      50,  // 满2000减150元优惠券 (5%)
+      120, // 满1000减80元优惠券 (12%)
+      200, // 满500减50元优惠券 (20%)
+      602  // 参与奖-10元无门槛券 (60.2%)
+    ];
 
     // 动画顺序（模拟转盘旋转）
     const animationOrder = [1, 2, 3, 6, 8, 7, 4]; // 修复了错误的ID值
@@ -398,99 +488,176 @@
     
     // 显示用户奖品
     function showMyPrizes() {
-      const prizesList = document.getElementById('prizes-list');
-      const noPrizes = document.getElementById('no-prizes');
-      const prizesModal = document.getElementById('prizes-modal');
-      
-      // 获取当前用户的中奖记录
-      const currentPhone = currentPhoneNumber || localStorage.getItem('lastPhoneNumber');
-      if (!currentPhone) {
-        noPrizes.classList.remove('hidden');
-        prizesList.classList.add('hidden');
-        prizesModal.style.display = 'flex';
-        return;
-      }
-      
-      // 从localStorage获取所有中奖记录
-      const allUserPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
-      
-      // 筛选当前用户的中奖记录
-      const userPrizes = allUserPrizes.filter(item => item.phone === currentPhone);
-      
-      // 清空现有列表
-      prizesList.innerHTML = '';
-      
-      if (userPrizes.length === 0) {
-        // 无中奖记录
-        noPrizes.classList.remove('hidden');
-        prizesList.classList.add('hidden');
-      } else {
-        // 有中奖记录，生成列表
-        noPrizes.classList.add('hidden');
-        prizesList.classList.remove('hidden');
+          try {
+            // 获取弹窗元素
+            let prizesModal = document.getElementById('prizes-modal');
+            
+            // 确保弹窗存在
+            if (!prizesModal) {
+              // 创建弹窗
+              const modalHTML = `
+                <div id="prizes-modal" class="fixed inset-0 bg-black/50 z-50 items-center justify-center hidden">
+                  <div class="bg-white rounded-xl w-4/5 max-w-sm max-h-[80vh] overflow-hidden">
+                    <div class="bg-gradient-to-r from-primary to-secondary p-4 text-center">
+                      <h3 class="text-white text-xl font-bold">我的奖品</h3>
+                    </div>
+                    <div class="p-6">
+                      <div id="prizes-list" class="space-y-4 max-h-[60vh] overflow-y-auto">
+                        <div id="no-prizes" class="text-center text-gray-500 py-8">
+                          <i class="fa fa-trophy text-gray-300 text-3xl mb-2"></i>
+                          <p>暂无中奖记录</p>
+                        </div>
+                      </div>
+                      <div class="px-6 pb-6">
+                        <button id="close-prizes" class="bg-gray-200 text-gray-700 py-3 px-8 rounded-full font-bold w-full hover:bg-gray-300 transition-all">
+                          关闭
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+              document.body.insertAdjacentHTML('beforeend', modalHTML);
+              prizesModal = document.getElementById('prizes-modal');
+            }
+            
+            const prizesList = document.getElementById('prizes-list');
+            
+            if (!prizesList) {
+              console.error('找不到必要的DOM元素');
+              alert('系统错误，请稍后再试');
+              return;
+            }
+            
+            // 清空列表
+            prizesList.innerHTML = '';
+            
+            // 获取当前用户电话
+            const currentPhone = currentPhoneNumber || localStorage.getItem('lastPhoneNumber');
+            console.log('当前用户电话:', currentPhone);
+            
+            if (!currentPhone) {
+              // 如果没有电话号码，显示无中奖记录
+              prizesList.innerHTML = `
+                <div id="no-prizes" class="text-center text-gray-500 py-8">
+                  <i class="fa fa-trophy text-gray-300 text-3xl mb-2"></i>
+                  <p>暂无中奖记录</p>
+                </div>
+              `;
+            } else {
+              // 获取所有中奖记录
+              const allPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
+              console.log('所有中奖记录:', allPrizes);
+              
+              // 筛选当前用户的中奖记录
+              const userPrizes = allPrizes.filter(prize => prize.phone === currentPhone);
+              console.log('用户中奖记录:', userPrizes);
+              
+              if (userPrizes.length === 0) {
+                // 无中奖记录
+                prizesList.innerHTML = `
+                  <div id="no-prizes" class="text-center text-gray-500 py-8">
+                    <i class="fa fa-trophy text-gray-300 text-3xl mb-2"></i>
+                    <p>暂无中奖记录</p>
+                  </div>
+                `;
+              } else {
+                // 有中奖记录，生成列表
+                // 按时间倒序排序
+                userPrizes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                userPrizes.forEach((prize) => {
+                  const prizeItem = document.createElement('div');
+                  prizeItem.className = 'bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 flex items-center';
+                  
+                  // 奖品图标
+                  const iconDiv = document.createElement('div');
+                  iconDiv.className = 'bg-white rounded-full w-12 h-12 flex items-center justify-center mr-4 shadow-md';
+                  iconDiv.innerHTML = `<i class="fa ${prize.prizeIcon || 'fa-gift'} text-primary text-xl"></i>`;
+                  
+                  // 奖品信息
+                  const infoDiv = document.createElement('div');
+                  infoDiv.className = 'flex-1';
+                  
+                  const nameSpan = document.createElement('div');
+                  nameSpan.className = 'font-bold text-gray-800';
+                  nameSpan.textContent = prize.prizeName;
+                  
+                  const valueSpan = document.createElement('div');
+                  valueSpan.className = 'text-sm text-gray-500';
+                  valueSpan.textContent = `价值: ${prize.prizeValue || '未知'}`;
+                  
+                  // 中奖时间
+                  const timeSpan = document.createElement('div');
+                  timeSpan.className = 'text-xs text-gray-400';
+                  timeSpan.textContent = `中奖时间: ${formatDate(prize.timestamp)}`;
+                  
+                  infoDiv.appendChild(nameSpan);
+                  infoDiv.appendChild(valueSpan);
+                  infoDiv.appendChild(timeSpan);
+                  
+                  prizeItem.appendChild(iconDiv);
+                  prizeItem.appendChild(infoDiv);
+                  
+                  prizesList.appendChild(prizeItem);
+                });
+              }
+            }
+            
+            // 显示弹窗
+            prizesModal.style.display = 'flex';
+            
+            // 绑定关闭事件
+            const closeBtn = document.getElementById('close-prizes');
+            if (closeBtn) {
+              // 移除所有现有的事件监听器
+              const newCloseBtn = closeBtn.cloneNode(true);
+              closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+              
+              // 绑定新的点击事件
+              newCloseBtn.onclick = function() {
+                console.log('关闭按钮被点击');
+                const modal = document.getElementById('prizes-modal');
+                if (modal) {
+                  modal.style.display = 'none';
+                  console.log('弹窗已关闭');
+                }
+              };
+            }
+            
+            // 点击弹窗外部关闭
+            const modal = document.getElementById('prizes-modal');
+            modal.onclick = function(e) {
+              if (e.target === modal) {
+                modal.style.display = 'none';
+              }
+            };
+          } catch (error) {
+            console.error('显示奖品时出错:', error);
+            alert('查看奖品失败，请稍后再试');
+          }
+        }
         
-        // 按时间倒序排序
-        userPrizes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        // 为"我的奖品"按钮添加点击事件
+        function bindMyPrizesButton() {
+          const myPrizesBtn = document.getElementById('my-prizes');
+          if (myPrizesBtn) {
+            // 使用更简单可靠的方式绑定点击事件
+            myPrizesBtn.onclick = function() {
+              console.log('我的奖品按钮被点击');
+              showMyPrizes();
+            };
+            console.log('我的奖品按钮事件绑定成功');
+          } else {
+            console.error('找不到我的奖品按钮');
+          }
+        }
         
-        userPrizes.forEach((prize) => {
-          const prizeItem = document.createElement('div');
-          prizeItem.className = 'bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 flex items-center';
-          
-          // 奖品图标
-          const iconDiv = document.createElement('div');
-          iconDiv.className = 'bg-white rounded-full w-12 h-12 flex items-center justify-center mr-4 shadow-md';
-          iconDiv.innerHTML = `<i class="fa ${prize.prizeIcon} text-primary text-xl"></i>`;
-          
-          // 奖品信息
-          const infoDiv = document.createElement('div');
-          infoDiv.className = 'flex-1';
-          
-          const nameSpan = document.createElement('div');
-          nameSpan.className = 'font-bold text-gray-800';
-          nameSpan.textContent = prize.prizeName;
-          
-          const valueSpan = document.createElement('div');
-          valueSpan.className = 'text-sm text-gray-500';
-          valueSpan.textContent = `价值: ${prize.prizeValue}`;
-          
-          // 日期信息
-          const dateSpan = document.createElement('div');
-          dateSpan.className = 'text-xs text-gray-400';
-          const date = new Date(prize.timestamp);
-          dateSpan.textContent = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          
-          infoDiv.appendChild(nameSpan);
-          infoDiv.appendChild(valueSpan);
-          infoDiv.appendChild(dateSpan);
-          
-          prizeItem.appendChild(iconDiv);
-          prizeItem.appendChild(infoDiv);
-          
-          prizesList.appendChild(prizeItem);
-        });
-      }
-      
-      // 显示弹窗
-      prizesModal.style.display = 'flex';
-    }
-    
-    // 初始化
-    initCheck();
-    
-    // 为"我的奖品"按钮添加点击事件
-    document.getElementById('my-prizes').addEventListener('click', showMyPrizes);
-    
-    // 关闭我的奖品弹窗
-    document.getElementById('close-prizes').addEventListener('click', () => {
-      document.getElementById('prizes-modal').style.display = 'none';
-    });
-    
-    // 点击弹窗外部关闭
-    document.getElementById('prizes-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('prizes-modal')) {
-        document.getElementById('prizes-modal').style.display = 'none';
-      }
-    });
+        // 立即绑定
+        bindMyPrizesButton();
+        
+        // 备用的延时绑定
+        setTimeout(bindMyPrizesButton, 500);
     
     // 管理员功能 - 验证码验证相关
     const adminEntry = document.getElementById('admin-entry');
@@ -696,27 +863,26 @@
       document.body.removeChild(link);
     }
 
-    // 根据概率随机选择奖品
+    // 根据概率随机选择奖品 - 优化版
     function selectPrize() {
-      // 重新计算有效概率（排除0概率的奖项）
-      const validProbabilities = probabilities.map(p => p);
-      
-      // 谢谢参与的概率 = 100% - 其他奖项概率总和
-      const totalProbability = validProbabilities.reduce((a, b) => a + b, 0);
-      validProbabilities[7] = 1000 - totalProbability; // 1000代表100%（0.1%为1单位）
-      
+      // 直接使用配置的概率权重
       // 计算总权重
-      const total = validProbabilities.reduce((a, b) => a + b, 0);
+      const total = probabilities.reduce((a, b) => a + b, 0);
       let random = Math.random() * total;
       let sum = 0;
       
-      for (let i = 0; i < validProbabilities.length; i++) {
-        sum += validProbabilities[i];
+      // 根据随机数选择奖品
+      for (let i = 0; i < probabilities.length; i++) {
+        sum += probabilities[i];
         if (random < sum) {
-          return prizes[i];
+          const selectedPrize = prizes[i];
+          console.log(`抽奖结果: ${selectedPrize.name} (概率权重: ${probabilities[i]}/${total})`);
+          return selectedPrize;
         }
       }
-      return prizes[7]; // 默认返回谢谢参与
+      
+      // 默认返回参与奖（理论上不应该走到这里）
+      return prizes[7];
     }
 
     // 抽奖动画
@@ -775,20 +941,25 @@
       });
     }
 
-    // 奖品详细信息配置
+    // 奖品详情配置 - 优化版
     const prizeDetails = {
-      1: { description: '高端智能机器狗，支持多种交互模式', value: '价值 ¥9997' },
-      2: { description: '德龙品牌高端咖啡机，享受专业咖啡体验', value: '价值 ¥3390' },
-      3: { description: '美的商用级微波炉，大容量智能操作', value: '价值 ¥1799' },
-      4: { description: '专业茶杯消毒柜，UV杀菌保护健康', value: '价值 ¥549' },
-      5: { description: '满3000元即可使用，有效期30天', value: '价值 ¥200' },
-      6: { description: '满1000元即可使用，有效期30天', value: '价值 ¥50' },
-      7: { description: '满300元即可使用，有效期30天', value: '价值 ¥20' },
-      8: { description: '不要灰心，再接再厉', value: '' }
+      1: { description: '最新款智能手表，健康监测+运动追踪，全天候陪伴', value: '价值 ¥3199' },
+      2: { description: '强劲吸力，智能清洁，让您的家焕然一新', value: '价值 ¥4990' },
+      3: { description: '7英寸OLED屏幕，畅玩热门游戏，随时随地娱乐', value: '价值 ¥2599' },
+      4: { description: '高效净化空气，去除有害物质，守护家人健康', value: '价值 ¥1299' },
+      5: { description: '全场通用，无品类限制，有效期60天', value: '价值 ¥150' },
+      6: { description: '全场通用，无品类限制，有效期60天', value: '价值 ¥80' },
+      7: { description: '全场通用，无品类限制，有效期60天', value: '价值 ¥50' },
+      8: { description: '感谢参与！无门槛使用，全场通用，有效期30天', value: '价值 ¥10' }
     };
 
     // 显示结果
     function showResult(prize) {
+      // 获取DOM元素
+      const resultIcon = document.getElementById('result-icon');
+      const resultPrize = document.getElementById('result-prize');
+      const modalTitle = document.querySelector('#result-modal h3');
+      
       // 设置图标
       resultIcon.innerHTML = `<i class="fa ${prize.icon}"></i>`;
       resultIcon.className = `${prize.color} text-5xl mb-3`;
@@ -801,15 +972,57 @@
       document.getElementById('prize-description').textContent = details.description;
       document.getElementById('prize-value').textContent = details.value;
       
-      // 为不同类型的奖品添加特殊样式
-      const resultPrize = document.getElementById('result-prize');
+      // 重置样式
+      modalTitle.textContent = '恭喜中奖';
+      resultPrize.className = 'mb-6 p-4 rounded-xl inline-block';
+      resultIcon.className = `${prize.color} text-5xl mb-3`;
+      
+      // 添加通用的淡入效果
+      resultPrize.style.opacity = '0';
+      setTimeout(() => {
+        resultPrize.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+        resultPrize.style.opacity = '1';
+      }, 100);
+      
+      // 根据奖品等级设置不同样式和特效
       if (prize.id <= 3) { // 高价值奖品
-        resultPrize.classList.add('shine', 'border-2', 'border-gold');
-      } else if (prize.id === 8) { // 谢谢参与
-        document.querySelector('#result-modal h3').textContent = '感谢参与';
-        resultPrize.classList.remove('shine', 'border-2', 'border-gold');
-      } else { // 优惠券等
-        resultPrize.classList.remove('shine', 'border-2', 'border-gold');
+        // 高价值奖品特殊样式
+        resultPrize.classList.add('bg-gradient-to-r', 'from-amber-50', 'to-yellow-100');
+        resultPrize.classList.add('border-2', 'border-yellow-400', 'shadow-lg');
+        modalTitle.textContent = '🎉 恭喜获得大奖 🎉';
+        modalTitle.classList.add('text-yellow-600');
+        
+        // 添加闪烁动画效果
+        resultPrize.classList.add('animate-pulse');
+        setTimeout(() => {
+          resultPrize.classList.remove('animate-pulse');
+          // 添加缩放动画
+          resultPrize.style.transform = 'scale(1.05)';
+          setTimeout(() => {
+            resultPrize.style.transform = 'scale(1)';
+          }, 300);
+        }, 2000);
+        
+      } else if (prize.id <= 4) { // 中价值奖品
+        resultPrize.classList.add('bg-gradient-to-r', 'from-gray-50', 'to-gray-100');
+        resultPrize.classList.add('border-2', 'border-gray-300');
+        modalTitle.textContent = '🎊 恭喜中奖 🎊';
+        
+      } else if (prize.id <= 7) { // 优惠券
+        resultPrize.classList.add('bg-gradient-to-r', 'from-primary/15', 'to-secondary/15');
+        resultPrize.classList.add('shadow-sm');
+        
+        // 优惠券特殊动画
+        setTimeout(() => {
+          resultPrize.style.transform = 'scale(1.02) rotate(1deg)';
+          setTimeout(() => {
+            resultPrize.style.transform = 'scale(1) rotate(0deg)';
+          }, 200);
+        }, 300);
+        
+      } else { // 参与奖
+        modalTitle.textContent = '🎁 恭喜获得参与奖 🎁';
+        resultPrize.classList.add('bg-gray-50', 'border', 'border-gray-200');
       }
       
       // 显示弹窗并添加弹出动画
@@ -841,20 +1054,7 @@
       localStorage.setItem('lastPhoneNumber', phone);
     }
     
-    // "我的奖品"按钮点击事件
-    document.getElementById('my-prizes').addEventListener('click', showMyPrizes);
-    
-    // 关闭"我的奖品"弹窗
-    document.getElementById('close-prizes').addEventListener('click', () => {
-      document.getElementById('prizes-modal').style.display = 'none';
-    });
-    
-    // 点击"我的奖品"弹窗外部关闭
-    document.getElementById('prizes-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('prizes-modal')) {
-        document.getElementById('prizes-modal').style.display = 'none';
-      }
-    });
+    // 事件监听器已在showMyPrizes函数内部处理，避免重复绑定
     
     // 提交电话号码
     submitPhone.addEventListener('click', () => {
@@ -904,22 +1104,26 @@
       }
     });
     
-    // 记录用户中奖信息
+    // 记录用户中奖信息 - 优化版
     function recordUserPrize(phone, prize) {
-      if (prize.name === '谢谢参与') return; // 不记录未中奖情况
-      
+      // 现在所有奖品（包括参与奖）都需要记录
       const userPrizes = JSON.parse(localStorage.getItem('userPrizes') || '[]');
       const timestamp = new Date().toISOString();
+      
+      // 获取奖品详情中的价值信息
+      const details = window.prizeDetails ? (window.prizeDetails[prize.id] || {}) : {};
       
       userPrizes.push({
         phone: phone,
         prizeName: prize.name,
-        prizeValue: prize.value,
+        prizeValue: details.value || '价值未知',
         prizeIcon: prize.icon,
-        timestamp: timestamp
+        timestamp: timestamp,
+        prizeId: prize.id // 添加奖品ID便于后续查询
       });
       
       localStorage.setItem('userPrizes', JSON.stringify(userPrizes));
+      console.log(`已记录用户 ${phone} 的中奖信息: ${prize.name}`);
     }
     
     // 开始抽奖流程
@@ -962,8 +1166,8 @@
       }
     });
     
-
-
+    // 调试函数 - 确保代码正确闭合
+    console.log('抽奖程序加载完成');
   </script>
 </body>
 </html>
